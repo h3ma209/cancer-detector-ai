@@ -2,7 +2,7 @@ IMAGE := registry.hf.space/sowndarya18-skincancerprediction:latest
 PORT := 7860
 PYTHON := .venv/bin/python
 
-.PHONY: run run-docker pull setup
+.PHONY: run run-docker pull setup docker-up docker-down
 
 setup:
 	python3.12 -m venv .venv
@@ -12,7 +12,14 @@ setup:
 run: $(PYTHON)
 	GRADIO_SERVER_NAME=0.0.0.0 GRADIO_SERVER_PORT=$(PORT) $(PYTHON) app.py
 
-# Slow on Apple Silicon: amd64 image runs under QEMU emulation
+# Own image (best for Windows / Linux). On Apple Silicon first build is amd64-slow unless --platform linux/arm64
+docker-up:
+	docker compose up --build
+
+docker-down:
+	docker compose down
+
+# Old HF registry image (amd64). Slow under QEMU on Apple Silicon.
 run-docker:
 	sudo docker run -it --rm -p $(PORT):7860 --platform=linux/amd64 \
 		-e GRADIO_SERVER_NAME=0.0.0.0 \
