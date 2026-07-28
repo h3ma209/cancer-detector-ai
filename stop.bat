@@ -1,10 +1,14 @@
 @echo off
-setlocal
+setlocal EnableExtensions
 cd /d "%~dp0"
 
-if exist ".venv\Scripts\python.exe" (
-  echo Closing app if running is enough: press Ctrl+C in the run window.
-  echo Optional: remove venv with:  rmdir /s /q .venv
-) else (
-  echo Nothing to stop. App not set up yet.
+echo Stopping Docker containers...
+docker compose down
+if errorlevel 1 (
+  echo Failed to stop. Is Docker Desktop running?
+  pause
+  exit /b 1
 )
+
+echo Stopped.
+pause
